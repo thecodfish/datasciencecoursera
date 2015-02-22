@@ -52,6 +52,8 @@ mean(): Mean value
 
 std(): Standard deviation
 
+Each variable uses the same "time" unit.
+
 ##Experimental Design
 Each variable (66 total) was combined with the 6 activities performed and the 30 subjects who performed them via cbind, rbind, and merge
 
