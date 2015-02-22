@@ -53,5 +53,6 @@ run_analysis <- function() {
   meltdata <- melt(full_data,id.vars = c("activity","subject_id"),measure.vars = colnames(full_data[4:69]))
   tidy <- acast(meltdata, subject_id + activity ~ variable,mean)
   write.table(tidy,"~/tidy_data.txt",row.name = FALSE)
+  write.table(rownames(tidy),"~/tidy_row_names.txt",row.name = FALSE)
   tidy
 }
