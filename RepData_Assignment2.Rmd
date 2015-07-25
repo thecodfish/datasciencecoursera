@@ -33,7 +33,7 @@ Next, we will calculate the primary metric by which we will determine damage to 
 
 ```{r}
 library(dplyr)
-StormData <- mutate(test,TOTAL_POP_DMG = FATALITIES + INJURIES)
+StormData <- mutate(StormData,TOTAL_POP_DMG = FATALITIES + INJURIES)
 ```
 
 We will also calculate the primary metric by which we will calculate economic damage (property damage + crop damage). In order to do this, we need to first convert the exponent columns to numeric values.
@@ -46,37 +46,46 @@ sort(summary(StormData$CROPDMGEXP))
 We will be using this method[https://rstudio-pubs-static.s3.amazonaws.com/58957_37b6723ee52b455990e149edde45e5b6.html] for creating the correct exponent values.
 
 ```{r}
-StormData$PROPDMGEXP <- gsub("0",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("1",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("2",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("3",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("4",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("5",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("6",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("7",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("8",10,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("\\+",10,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("0",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("1",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("2",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("3",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("4",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("5",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("6",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("7",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("8",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("\\+",1,StormData$PROPDMGEXP,ignore.case = TRUE)
 
-StormData$PROPDMGEXP <- gsub("\\-",1,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("\\?",1,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("\\-",0,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("\\?",0,StormData$PROPDMGEXP,ignore.case = TRUE)
 
-StormData$PROPDMGEXP <- gsub("H",100,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("K",1000,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("M",1000000,StormData$PROPDMGEXP,ignore.case = TRUE)
-StormData$PROPDMGEXP <- gsub("B",1000000000,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("H",2,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("K",3,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("M",6,StormData$PROPDMGEXP,ignore.case = TRUE)
+StormData$PROPDMGEXP <- gsub("B",9,StormData$PROPDMGEXP,ignore.case = TRUE)
 
-StormData$CROPDMGEXP <- gsub("0",10,StormData$CROPDMGEXP,ignore.case = TRUE)
-StormData$CROPDMGEXP <- gsub("2",10,StormData$CROPDMGEXP,ignore.case = TRUE)
+StormData$CROPDMGEXP <- gsub("0",1,StormData$CROPDMGEXP,ignore.case = TRUE)
+StormData$CROPDMGEXP <- gsub("2",1,StormData$CROPDMGEXP,ignore.case = TRUE)
 
-StormData$CROPDMGEXP <- gsub("\\?",1,StormData$CROPDMGEXP,ignore.case = TRUE)
+StormData$CROPDMGEXP <- gsub("\\?",0,StormData$CROPDMGEXP,ignore.case = TRUE)
 
-StormData$CROPDMGEXP <- gsub("H",100,StormData$CROPDMGEXP,ignore.case = TRUE)
-StormData$CROPDMGEXP <- gsub("K",1000,StormData$CROPDMGEXP,ignore.case = TRUE)
-StormData$CROPDMGEXP <- gsub("M",1000000,StormData$CROPDMGEXP,ignore.case = TRUE)
-StormData$CROPDMGEXP <- gsub("B",1000000000,StormData$CROPDMGEXP,ignore.case = TRUE)
+StormData$CROPDMGEXP <- gsub("H",2,StormData$CROPDMGEXP,ignore.case = TRUE)
+StormData$CROPDMGEXP <- gsub("K",3,StormData$CROPDMGEXP,ignore.case = TRUE)
+StormData$CROPDMGEXP <- gsub("M",6,StormData$CROPDMGEXP,ignore.case = TRUE)
+StormData$CROPDMGEXP <- gsub("B",9,StormData$CROPDMGEXP,ignore.case = TRUE)
 
+StormData$CROPDMGEXP <- as.numeric(StormData$CROPDMGEXP)
+StormData$PROPDMGEXP <- as.numeric(StormData$PROPDMGEXP)
+
+StormData$PROPDMGEXP<-replace(StormData$PROPDMGEXP,is.na(StormData$PROPDMGEXP),0)
+StormData$CROPDMGEXP<-replace(StormData$CROPDMGEXP,is.na(StormData$CROPDMGEXP),0)
 ```
 
+Then, we will calculate the total economic damage ((PROPDMG * PROPDMGEXP) + (CROPDMG * CROPDMGEXP)).
 
+```{r}
+StormData <- mutate(StormData,TOTAL_ECON_DMG = (PROPDMG * 10^PROPDMGEXP) + (CROPDMG * 10^CROPDMGEXP))
+```
 
 ##Results
