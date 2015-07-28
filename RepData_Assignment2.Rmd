@@ -3,9 +3,8 @@ title: "Economic and Health Effects of Environmental Events"
 output: html_document
 ---
 
-#Economic and Health Effects of Environmental Events
-
 ##Summary
+In this report, we attempt to determine which weather events cause the greatest economic and population damage across the United States over the time period 1950-2011. The data is taken from NOAA's storm database and can be downloaded [here](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2). Our hypothesis is that both economic and population damage is increasing over time. By adding up fatalities & injuries and crop damage & property damage, we found this was so. We found that the most devestating event types fell into similar categories. Additionaly, by plotting the damage over time, we discovered that economic damage is increasing at a much faster rate than population damage.
 
 ##Data Processing
 
@@ -28,7 +27,7 @@ StormData <- mutate(StormData,TOTAL_POP_DMG = FATALITIES + INJURIES)
 We will also calculate the primary metric by which we will calculate economic damage (property damage + crop damage). In order to do this, we need to first convert the exponent columns to numeric values.
 
 There are several different values in both the PROPDMGEXP and CROPDMGEXP columns.
-We will be using this method[https://rstudio-pubs-static.s3.amazonaws.com/58957_37b6723ee52b455990e149edde45e5b6.html] for creating the correct exponent values.
+We will be using this [method](https://rstudio-pubs-static.s3.amazonaws.com/58957_37b6723ee52b455990e149edde45e5b6.html) for creating the correct exponent values.
 
 ```{r}
 StormData$PROPDMGEXP <- gsub("0",1,StormData$PROPDMGEXP,ignore.case = TRUE)
@@ -83,6 +82,7 @@ StormData <- group_by(StormData,EVTYPE)
 
 Tornadoes have the highest human cost by far. Total fatalities + injuries surpass the next highest event (Excessive Heat) by more than 10x. In addition, two other wind-related events appear in the top 10.
 ```{r}
+
 POP_DMG <- summarise(StormData,TOTAL_FATALITIES = sum(FATALITIES),TOTAL_INJURIES = sum(INJURIES),TOTAL_POP_DMG = sum(TOTAL_POP_DMG))
 arrange(POP_DMG,desc(TOTAL_POP_DMG))
 ```
@@ -94,9 +94,16 @@ arrange(ECON_DMG,desc(TOTAL_ECON_DMG))
 ```
 
 
-Finally, let's look at Total Economic and Population damage over time
+Finally, let's look at how Total Economic and Population damage changes over time (on a logarithmic scale).
 ```{r}
+library(reshape2)
+library(lubridate)
+library(ggplot2)
 DMG_BY_YEAR <- mutate(StormData,YEAR = year(strptime(BGN_DATE,format = "%m/%d/%Y %H:%M:%S"))) %>% group_by(YEAR) %>% summarise(TOTAL_ECON_DMG = sum(TOTAL_ECON_DMG),TOTAL_POP_DMG = sum(TOTAL_POP_DMG))
 
+meltdata<-melt(DMG_BY_YEAR,id.vars = "YEAR")
 
+qplot(x = meltdata$YEAR,y = meltdata$value,colour = meltdata$variable, geom = c("point","smooth"),log = "y", xlab = "Year",ylab = "Damage",main = "Economic and Population Damage Over Time")
 ```
+
+Interestingly, economic damage appears to be increasing at a faster rate than population damage, even when plotted on a logarithmic scale. Obviously, the loss of human life is tragic, but while population damage remained relatively steady, the scale and accelerating rate of economic damage is concerning.
